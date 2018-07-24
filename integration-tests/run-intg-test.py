@@ -48,6 +48,7 @@ db_host = None
 db_port = None
 db_username = None
 db_password = None
+tag_name = None
 database_config = {}
 
 
@@ -111,11 +112,31 @@ def read_proprty_files():
 
 
 def validate_property_radings():
-    if None in (
-            db_engine_version, git_repo_url, product_id, git_branch, product_dist_download_api, sql_driver_location,
-            db_host, db_port, db_password):
+    missing_values = ""
+    if db_engine is None:
+        missing_values += " -DBEngine- "
+    if git_repo_url is None:
+        missing_values += " -gitURL- "
+    if product_id is None:
+        missing_values += " -product-id- "
+    if git_branch is None:
+        missing_values += " -gitBranch- "
+    if product_dist_download_api is None:
+        missing_values += " -productDistDownloadApi- "
+    if sql_driver_location is None:
+        missing_values += " -sqlDriversLocatio<OS_Type>- "
+    if db_host is None:
+        missing_values += " -DatabaseHost- "
+    if db_port is None:
+        missing_values += " -DatabasePort- "
+    if db_password is None:
+        missing_values += " -DBPassword- "
+
+    if missing_values != "":
+        logger.error('Invalid property file is found. Missing values: %s ', missing_values)
         return False
-    return True
+    else:
+        return True
 
 
 def get_db_meta_data(argument):
@@ -124,7 +145,7 @@ def get_db_meta_data(argument):
 
 
 def construct_url(prefix):
-    url = prefix + db_host + ":" + db_port + "/"
+    url = prefix + db_host + ":" + db_port
     return url
 
 
@@ -423,56 +444,55 @@ def run_integration_test():
     """
     integration_tests_path = Path(workspace + "/" + product_id + "/" + 'modules/integration')
     if sys.platform.startswith('win'):
-        subprocess.call(['mvn', '--batch-mode', 'clean', 'install'], shell=True, cwd=integration_tests_path)
+        subprocess.call(['mvn', 'clean', 'install', '-B',
+                         '-Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn'],
+                        shell=True, cwd=integration_tests_path)
     else:
-        subprocess.call(['mvn', '--batch-mode', 'clean', 'install'], cwd=integration_tests_path)
+        subprocess.call(['mvn', 'clean', 'install', '-B',
+                         '-Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn'],
+                        cwd=integration_tests_path)
     logger.info('Integration test Running is completed.')
-
-
-def build_import_export_module():
-    """Build the apim import export module.
-    """
-    integration_tests_path = Path(workspace + "/" + product_id + "/" + 'modules/api-import-export')
-    if sys.platform.startswith('win'):
-        subprocess.call(['mvn', '--batch-mode', 'clean', 'install'], shell=True, cwd=integration_tests_path)
-    else:
-        subprocess.call(['mvn', '--batch-mode', 'clean', 'install'], cwd=integration_tests_path)
-    logger.info('Integration test Running is completed.')
-
 
 def save_log_files():
     log_storage = Path(workspace + "/" + LOG_STORAGE)
     if not Path.exists(log_storage):
         Path(log_storage).mkdir(parents=True, exist_ok=True)
-
-    for file in LOG_FILE_PATHS:
-        absolute_file_path = Path(workspace + "/" + product_id + "/" + file)
-        if Path.exists(absolute_file_path):
-            copy_file(absolute_file_path, log_storage)
-        else:
-            logger.error("File doesn't contain in the given location: " + str(absolute_file_path))
+    log_file_paths = LOG_FILE_PATHS[product_id]
+    if log_file_paths:
+        for file in log_file_paths:
+            absolute_file_path = Path(workspace + "/" + product_id + "/" + file)
+            if Path.exists(absolute_file_path):
+                copy_file(absolute_file_path, log_storage)
+            else:
+                logger.error("File doesn't contain in the given location: " + str(absolute_file_path))
 
 
 def clone_repo():
     """Clone the product repo and checkout to the latest tag of the branch
     """
     try:
+        global tag_name
         subprocess.call(['git', 'clone', '--branch', git_branch, git_repo_url], cwd=workspace)
         logger.info('cloning repo done.')
         git_path = Path(workspace + "/" + product_id)
-        hash_number = subprocess.Popen(["git", "rev-list", "--tags", "--max-count=1"], stdout=subprocess.PIPE,
-                                       cwd=git_path)
-        string_val_of_hash = hash_number.stdout.read().strip().decode("utf-8")
-        tag_name = subprocess.Popen(["git", "describe", "--tags", string_val_of_hash], stdout=subprocess.PIPE,
-                                    cwd=git_path)
-        string_val_of_tag_name = tag_name.stdout.read().strip().decode("utf-8")
-        tag = "tags/" + string_val_of_tag_name
+        binary_val_of_tag_name = subprocess.Popen(["git", "describe", "--abbrev=0", "--tags"],
+                                                  stdout=subprocess.PIPE, cwd=git_path)
+        tag_name = binary_val_of_tag_name.stdout.read().strip().decode("utf-8")
+        tag = "tags/" + tag_name
         subprocess.call(["git", "fetch", "origin", tag], cwd=git_path)
-        subprocess.call(["git", "checkout", "-B", tag, string_val_of_tag_name], cwd=git_path)
+        subprocess.call(["git", "checkout", "-B", tag, tag_name], cwd=git_path)
         logger.info('checkout to the branch: ' + tag)
     except Exception as e:
         logger.error("Error occurred while cloning the product repo and checkout to the latest tag of the branch",
                      exc_info=True)
+
+
+def create_output_property_fle():
+    output_property_file = open("output.properties", "w+")
+    git_url = git_repo_url + "/tree/" + git_branch
+    output_property_file.write("GIT_LOCATION=%s\r\n" % git_url)
+    output_property_file.write("GIT_REVISION=%s\r\n" % tag_name)
+    output_property_file.close()
 
 
 def main():
@@ -520,6 +540,7 @@ def main():
         #run integration tests
         run_integration_test()
         save_log_files()
+        create_output_property_fle()
     except Exception as e:
         logger.error("Error occurred while running the run-intg.py script", exc_info=True)
     except BaseException as e:
