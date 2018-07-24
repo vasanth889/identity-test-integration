@@ -25,7 +25,7 @@ import shutil
 import logging
 from const import ZIP_FILE_EXTENSION, NS, SURFACE_PLUGIN_ARTIFACT_ID, CARBON_NAME, VALUE_TAG, \
     DEFAULT_ORACLE_SID, DATASOURCE_PATHS, MYSQL_DB_ENGINE, ORACLE_DB_ENGINE, LIB_PATH, PRODUCT_STORAGE_DIR_NAME, \
-    DISTRIBUTION_PATH, POM_FILE_PATHS, MSSQL_DB_ENGINE
+    DISTRIBUTION_PATH, POM_FILE_PATHS
 
 datasource_paths = None
 database_url = None
@@ -84,8 +84,6 @@ def extract_product(path):
 
 
 def compress_distribution(distribution_path, root_dir):
-    if type(distribution_path) == str:
-        distribution_path = Path(distribution_path)
     if not Path.exists(distribution_path):
         Path(distribution_path).mkdir(parents=True, exist_ok=True)
 
@@ -158,20 +156,16 @@ def modify_datasources():
                     drive_class_name = configuration.find('driverClassName')
                     if MYSQL_DB_ENGINE == database_config['db_engine'].upper():
                         url.text = url.text.replace(url.text, database_config[
-                            'url'] + "/" + database_name + "?autoReconnect=true&useSSL=false&requireSSL=false&"
+                            'url'] + database_name + "?autoReconnect=true&useSSL=false&requireSSL=false&"
                                                      "verifyServerCertificate=false")
                         user.text = user.text.replace(user.text, database_config['user'])
                     elif ORACLE_DB_ENGINE == database_config['db_engine'].upper():
-                        url.text = url.text.replace(url.text, database_config['url'] + "/" + DEFAULT_ORACLE_SID)
+                        url.text = url.text.replace(url.text, database_config['url'] + DEFAULT_ORACLE_SID)
                         user.text = user.text.replace(user.text, database_name)
                         validation_query.text = validation_query.text.replace(validation_query.text,
                                                                               "SELECT 1 FROM DUAL")
-                    elif MSSQL_DB_ENGINE == database_config['db_engine'].upper():
-                        url.text = url.text.replace(url.text,
-                                                    database_config['url'] + ";" + "databaseName=" + database_name)
-                        user.text = user.text.replace(user.text, database_config['user'])
                     else:
-                        url.text = url.text.replace(url.text, database_config['url'] + "/" + database_name)
+                        url.text = url.text.replace(url.text, database_config['url'] + database_name)
                         user.text = user.text.replace(user.text, database_config['user'])
                     password.text = password.text.replace(password.text, database_config['password'])
                     drive_class_name.text = drive_class_name.text.replace(drive_class_name.text,
@@ -180,21 +174,14 @@ def modify_datasources():
         artifact_tree.write(file_path)
 
 
-def copy_distribution_to_m2(storage, name):
+def copy_distribution_to_m2(product_storage, product_name):
     # todo need to generalize this method
     home = Path.home()
-    version = name.split("-")[1]
-    linux_m2_path = home / ".m2/repository/org/wso2/is/wso2is" / version / name
-    windows_m2_path = Path(
-        "/Documents and Settings/Administrator/.m2/repository/org/wso2/is/wso2is" + "/" + version + "/" + name)
+    m2_path = home / ".m2/repository/org/wso2/is/wso2is" / product_name
+
     if sys.platform.startswith('win'):
-        windows_m2_path = winapi_path(windows_m2_path)
-        storage = winapi_path(storage)
-        compress_distribution(windows_m2_path, storage)
-        shutil.rmtree(windows_m2_path, onerror=on_rm_error)
-    else:
-        compress_distribution(linux_m2_path, storage)
-        shutil.rmtree(linux_m2_path, onerror=on_rm_error)
+        m2_path = winapi_path(m2_path)
+    compress_distribution(m2_path, product_storage)
 
 
 def configure_product(product, id, db_config, ws):
@@ -222,6 +209,12 @@ def configure_product(product, id, db_config, ws):
         zip_name = product_name + ZIP_FILE_EXTENSION
         product_location = Path(product_storage / zip_name)
         configured_product_path = Path(distribution_storage / product_name)
+        # Since we checkout to the latest released tag of the product repo, we don't need to modify pom files.
+        # pom_file_paths = POM_FILE_PATHS
+        # if pom_file_paths is not None:
+        #    modify_pom_files()
+        # else:
+        #    logger.info("pom file paths are not defined in the config file")
         logger.info(product_location)
         extract_product(product_location)
         copy_jar_file(Path(database_config['sql_driver_location']), Path(product_home_path / lib_path))
