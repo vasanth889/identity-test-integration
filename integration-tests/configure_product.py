@@ -25,7 +25,7 @@ import shutil
 import logging
 from const import ZIP_FILE_EXTENSION, NS, SURFACE_PLUGIN_ARTIFACT_ID, CARBON_NAME, VALUE_TAG, \
     DEFAULT_ORACLE_SID, DATASOURCE_PATHS, MYSQL_DB_ENGINE, ORACLE_DB_ENGINE, LIB_PATH, PRODUCT_STORAGE_DIR_NAME, \
-    DISTRIBUTION_PATH, POM_FILE_PATHS, MSSQL_DB_ENGINE
+    DISTRIBUTION_PATH, MSSQL_DB_ENGINE
 
 datasource_paths = None
 database_url = None
@@ -188,7 +188,7 @@ def modify_datasources():
 def copy_distribution_to_m2(storage, name):
     # todo need to generalize this method
     home = Path.home()
-    version = name.split("-")[1]
+    version = name.split("-")[1] + "-" + name.split("-")[2]
     linux_m2_path = home / ".m2/repository/org/wso2/is/wso2is" / version / name
     windows_m2_path = Path(
         "/Documents and Settings/Administrator/.m2/repository/org/wso2/am/wso2am" + "/" + version + "/" + name)

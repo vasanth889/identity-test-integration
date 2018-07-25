@@ -335,21 +335,30 @@ def setup_databases(script_path, db_names):
                 run_sqlserver_commands('CREATE DATABASE {0}'.format(database))
                 # manipulate script path
                 scriptPath = script_path / 'mssql.sql'
+                # manipulate conent script path
+                scriptPathConsent = script_path / 'consent/mssql.sql'
                 # run db scripts
                 run_sqlserver_script_file(database, str(scriptPath))
+                run_sqlserver_script_file(database, str(scriptPathConsent))
             elif db_engine.upper() == 'MYSQL':
                 scriptPath = script_path / 'mysql5.7.sql'
+                # manipulate conent script path
+                scriptPathConsent = script_path / 'consent/mysql-5.7.sql'
                 # create database
                 run_mysql_commands('CREATE DATABASE IF NOT EXISTS {0};'.format(database))
                 # run db script
                 run_mysql_script_file(database, str(scriptPath))
+                run_mysql_script_file(database, str(scriptPathConsent))
 
             elif db_engine.upper() == 'ORACLE-SE2':
                 # create oracle schema
                 logger.info(create_oracle_user(database))
                 # run db script
                 scriptPath = script_path / 'oracle.sql'
+                # manipulate conent script path
+                scriptPathConsent = script_path / 'consent/oracle.sql'
                 logger.info(run_oracle_script('@{0}'.format(str(scriptPath)), database))
+                logger.info(run_oracle_script('@{0}'.format(str(scriptPathConsent)), database))
         elif database == DB_IS_DB:
             if db_engine.upper() == 'SQLSERVER-SE':
                 # create database
