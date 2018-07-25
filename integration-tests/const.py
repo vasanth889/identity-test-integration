@@ -17,15 +17,18 @@ ZIP_FILE_EXTENSION = ".zip"
 CARBON_NAME = "carbon.zip"
 VALUE_TAG = "{http://maven.apache.org/POM/4.0.0}value"
 SURFACE_PLUGIN_ARTIFACT_ID = "maven-surefire-plugin"
-DATASOURCE_PATHS = ["repository/conf/datasources/master-datasources.xml",
-                    "repository/conf/datasources/metrics-datasources.xml", "repository/conf/datasources/bps-datasources.xml"]
-POM_FILE_PATHS = ["modules/integration/tests-integration/tests-backend/pom.xml",
-                  "modules/integration/tests-ui-integration/pom.xml",
-                  "modules/integration/tests-common/pom.xml"]
+DATASOURCE_PATHS = {"product-apim": ["repository/conf/datasources/master-datasources.xml",
+                                     "repository/conf/datasources/metrics-datasources.xml"],
+                    "product-is":  ["repository/conf/datasources/master-datasources.xml",
+                    			"repository/conf/datasources/metrics-datasources.xml",
+					 "repository/conf/datasources/bps-datasources.xml"],
+                    "product-ei": []}
 DIST_POM_PATH = {"product-is": "modules/distribution/pom.xml", "product-apim": "modules/distribution/product/pom.xml",
                  "product-ei": "distribution/pom.xml"}
 LIB_PATH = "repository/components/lib"
-DISTRIBUTION_PATH = "modules/distribution/product/target"
+DISTRIBUTION_PATH = {"product-apim": "modules/distribution/product/target",
+                     "product-is": "modules/distribution/target",
+                     "product-ei": "modules/distribution/target"}
 PRODUCT_STORAGE_DIR_NAME = "storage"
 TEST_PLAN_PROPERTY_FILE_NAME = "testplan-props.properties"
 INFRA_PROPERTY_FILE_NAME = "infrastructure.properties"
@@ -36,6 +39,7 @@ MYSQL_DB_ENGINE = "MYSQL"
 DEFAULT_ORACLE_SID = "orcl"
 DB_CARBON_DB = 'WSO2_CARBON_DB'
 DB_AM_DB = 'WSO2AM_DB'
+DB_IS_DB = 'WSO2IS_DB'
 DB_STAT_DB = 'WSO2AM_STATS_DB'
 DB_BPS_DB = 'BPS_DS'
 DB_METRICS_DB = 'WSO2_METRICS_DB'
