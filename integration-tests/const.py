@@ -45,13 +45,23 @@ DB_BPS_DB = 'BPS_DS'
 DB_METRICS_DB = 'WSO2_METRICS_DB'
 DEFAULT_DB_USERNAME = "wso2carbon"
 LOG_STORAGE = "logs"
-LOG_FILE_PATHS = ["modules/integration/tests-integration/tests-backend/target/surefire-reports/emailable-report.html",
-                  "modules/integration/tests-integration/tests-backend/target/surefire-reports/index.html",
-                  "modules/integration/tests-integration/tests-backend/target/surefire-reports/TEST-TestSuite.xml",
-                  "modules/integration/tests-integration/tests-backend/target/surefire-reports/testng.css",
-                  "modules/integration/tests-integration/tests-backend/target/surefire-reports/testng-results.xml",
-                  "modules/integration/tests-integration/tests-backend/target/surefire-reports/TestSuite.txt",
-                  "modules/integration/tests-integration/tests-backend/target/logs/automation.log"]
+LOG_FILE_PATHS = {"product-apim": [
+    "modules/integration/tests-integration/tests-backend/target/surefire-reports/emailable-report.html",
+    "modules/integration/tests-integration/tests-backend/target/surefire-reports/index.html",
+    "modules/integration/tests-integration/tests-backend/target/surefire-reports/TEST-TestSuite.xml",
+    "modules/integration/tests-integration/tests-backend/target/surefire-reports/testng.css",
+    "modules/integration/tests-integration/tests-backend/target/surefire-reports/testng-results.xml",
+    "modules/integration/tests-integration/tests-backend/target/surefire-reports/TestSuite.txt",
+    "modules/integration/tests-integration/tests-backend/target/logs/automation.log"],
+    "product-is": [
+	"modules/integration/tests-integration/tests-backend/target/surefire-reports/emailable-report.html",
+	"modules/integration/tests-integration/tests-backend/target/surefire-reports/index.html",
+	"modules/integration/tests-integration/tests-backend/target/surefire-reports/TEST-TestSuite.xml",
+	"modules/integration/tests-integration/tests-backend/target/surefire-reports/testng.css",
+	"modules/integration/tests-integration/tests-backend/target/surefire-reports/testng-results.xml",
+	"modules/integration/tests-integration/tests-backend/target/surefire-reports/TestSuite.txt",
+	"modules/integration/tests-integration/tests-backend/target/logs/automation.log"],
+    "product-ei": []}
 DB_META_DATA = {
     "MYSQL": {"prefix": "jdbc:mysql://", "driverClassName": "com.mysql.jdbc.Driver", "jarName": "mysql.jar"},
     "SQLSERVER-SE": {"prefix": "jdbc:sqlserver://",
