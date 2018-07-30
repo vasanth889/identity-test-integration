@@ -133,7 +133,7 @@ wait_for_port ${host} 22
 if [ "${os}" = "Windows" ]; then
   echo "Waiting 4 minutes till Windows instance is configured. "
   sleep 4m #wait 4 minutes till Windows instance is configured and able to receive password using key file.
-  #set +o xtrace #avoid printing sensitive data in the next commands
+  set +o xtrace #avoid printing sensitive data in the next commands
   request_ec2_password $instance_id
   REM_DIR=$(echo "$REM_DIR" | sed 's/\\//g')
   echo "Copying files to ${REM_DIR}.."
@@ -154,10 +154,8 @@ if [ "${os}" = "Windows" ]; then
   sshpass -p "${password}" scp -r -q -o StrictHostKeyChecking=no ${user}@${host}:${REM_DIR}/product-is/modules/integration/tests-integration/tests-backend/target/surefire-reports ${DIR}
   sshpass -p "${password}" scp -q -o StrictHostKeyChecking=no ${user}@${host}:${REM_DIR}/product-is/modules/integration/tests-integration/tests-backend/target/logs/automation.log ${DIR}
   sshpass -p "${password}" scp -q -o StrictHostKeyChecking=no ${user}@${host}:${REM_DIR}/output.properties ${DIR}
-  scp -r -i ${key_pem} -o StrictHostKeyChecking=no ubuntu@34.232.211.33:/home/ubuntu/surefire-reports ${DIR}
-  scp -i ${key_pem} -o StrictHostKeyChecking=no ubuntu@34.232.211.33:/home/ubuntu/output.properties ${DIR}
   echo "=== Reports retrieved successfully ==="
-  #set -o xtrace
+  set -o xtrace
 else
   #for all UNIX instances
   ssh -o StrictHostKeyChecking=no -i ${key_pem} ${user}@${host} mkdir -p ${REM_DIR}
@@ -168,7 +166,6 @@ else
   scp -o StrictHostKeyChecking=no -i ${key_pem} ${FILE5} ${user}@${host}:${REM_DIR}
   scp -o StrictHostKeyChecking=no -i ${key_pem} ${FILE6} ${user}@${host}:${REM_DIR}
   scp -o StrictHostKeyChecking=no -i ${key_pem} ${FILE7} ${user}@${host}:${REM_DIR}
-
   echo "=== Files copied successfully ==="
 
   ssh -o StrictHostKeyChecking=no -i ${key_pem} ${user}@${host} bash ${REM_DIR}/intg-test-runner.sh --wd ${REM_DIR}
@@ -177,9 +174,6 @@ else
   scp -o StrictHostKeyChecking=no -r -i ${key_pem} ${user}@${host}:${REM_DIR}/product-is/modules/integration/tests-integration/tests-backend/target/surefire-reports ${DIR}
   scp -o StrictHostKeyChecking=no -r -i ${key_pem} ${user}@${host}:${REM_DIR}/product-is/modules/integration/tests-integration/tests-backend/target/logs/automation.log ${DIR}
   scp -o StrictHostKeyChecking=no -r -i ${key_pem} ${user}@${host}:${REM_DIR}/output.properties ${DIR}
-  scp -i ${key_pem} -o StrictHostKeyChecking=no ubuntu@34.232.211.33:/home/ubuntu/surefire-reports ${DIR}
-  scp -i ${key_pem} -o StrictHostKeyChecking=no ubuntu@34.232.211.33:/home/ubuntu/output.properties ${DIR}
-
   echo "=== Reports are copied success ==="
 fi
 ##script ends
