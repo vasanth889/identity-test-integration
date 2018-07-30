@@ -203,6 +203,7 @@ def copy_distribution_to_m2(storage, name):
 
 
 def configure_product(product, id, db_config, ws):
+    logger.info('Configuring product: ' + product)
     try:
         global product_name
         global product_id
@@ -233,7 +234,7 @@ def configure_product(product, id, db_config, ws):
         if datasource_paths is not None:
             modify_datasources()
         else:
-            logger.info("datasource paths are not defined in the config file")
+            logger.info("Datasource paths are not defined in the config file")
         os.remove(str(product_location))
         compress_distribution(configured_product_path, product_storage)
         copy_distribution_to_m2(product_storage, product_name)

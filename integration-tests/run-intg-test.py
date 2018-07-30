@@ -28,7 +28,7 @@ import requests
 import configure_product as cp
 from subprocess import Popen, PIPE
 from const import TEST_PLAN_PROPERTY_FILE_NAME, INFRA_PROPERTY_FILE_NAME, LOG_FILE_NAME, DB_META_DATA, \
-    PRODUCT_STORAGE_DIR_NAME, DB_CARBON_DB, DB_STAT_DB, DB_IS_DB, DB_BPS_DB, DB_METRICS_DB, DEFAULT_DB_USERNAME, \
+    PRODUCT_STORAGE_DIR_NAME, DB_CARBON_DB, DB_STAT_DB, DB_PRODUCT_DB, DB_BPS_DB, DB_METRICS_DB, DEFAULT_DB_USERNAME, \
     LOG_STORAGE, LOG_FILE_PATHS, DIST_POM_PATH, NS
 
 git_repo_url = None
@@ -179,6 +179,7 @@ def download_file(url, destination):
     """Download a file using wget package.
     Download the given file in _url_ as the directory+name provided in _destination_
     """
+    logger.info('Downloading file URL: ' + url + ' destination: ' + destination)
     wget.download(url, destination)
 
 
@@ -335,6 +336,7 @@ def setup_databases(script_path, db_names):
                 run_sqlserver_commands('CREATE DATABASE {0}'.format(database))
                 # manipulate script path
                 scriptPath = script_path / 'mssql.sql'
+
                 # manipulate conent script path
                 scriptPathConsent = script_path / 'consent/mssql.sql'
                 # run db scripts
@@ -359,7 +361,7 @@ def setup_databases(script_path, db_names):
                 scriptPathConsent = script_path / 'consent/oracle.sql'
                 logger.info(run_oracle_script('@{0}'.format(str(scriptPath)), database))
                 logger.info(run_oracle_script('@{0}'.format(str(scriptPathConsent)), database))
-        elif database == DB_IS_DB:
+        elif database == DB_PRODUCT_DB[product_id]:
             if db_engine.upper() == 'SQLSERVER-SE':
                 # create database
                 run_sqlserver_commands('CREATE DATABASE {0}'.format(database))
@@ -481,8 +483,9 @@ def clone_repo():
     """
     try:
         global tag_name
+        logger.info('cloning '+ git_repo_url + '@' + git_branch)
         subprocess.call(['git', 'clone', '--branch', git_branch, git_repo_url], cwd=workspace)
-        logger.info('cloning repo done.')
+        logger.info('cloning completed.')
         git_path = Path(workspace + "/" + product_id)
         binary_val_of_tag_name = subprocess.Popen(["git", "describe", "--abbrev=0", "--tags"],
                                                   stdout=subprocess.PIPE, cwd=git_path)
@@ -536,7 +539,7 @@ def main():
         product_file_path = product_download_dir / product_zip_name
         # download the last released pack from Jenkins
         download_file(dist_downl_url, str(product_file_path))
-        logger.info('downloading the pack from Jenkins done.')
+        logger.info('Downloading the pack from Jenkins done.')
 
         # populate databases
         script_path = Path(workspace + "/" + PRODUCT_STORAGE_DIR_NAME + "/" + product_name + "/" + 'dbscripts')
