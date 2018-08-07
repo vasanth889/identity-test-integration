@@ -327,23 +327,6 @@ def get_product_name():
     return product_name
 
 
-def get_product_dist_rel_path(jkns_api_url):
-    req_url = jkns_api_url + 'xml?xpath=/*/artifact[1]/relativePath'
-    headers = {'Accept': 'application/xml'}
-    response = requests.get(req_url, headers=headers)
-    if response.status_code == 200:
-        root = ET.fromstring(response.content)
-        dist_rel_path = root.text.split('wso2')[0]
-        return dist_rel_path
-    else:
-        logger.info('Failure on jenkins api call')
-
-
-def get_product_dist_artifact_path(jkns_api_url):
-    artifact_path = jkns_api_url.split('/api')[0] + '/artifact/'
-    return artifact_path
-
-
 def setup_databases(script_path, db_names):
     """Create required databases.
     """
@@ -485,22 +468,6 @@ def run_integration_test():
                         cwd=integration_tests_path)
     logger.info('Integration test Running is completed.')
 
-
-def build_import_export_module():
-    """Build the apim import export module.
-    """
-    integration_tests_path = Path(workspace + "/" + product_id + "/" + 'modules/api-import-export')
-    if sys.platform.startswith('win'):
-        subprocess.call(['mvn', 'clean', 'install', '-B',
-                         '-Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn'],
-                        shell=True, cwd=integration_tests_path)
-    else:
-        subprocess.call(['mvn', 'clean', 'install', '-B',
-                         '-Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn'],
-                        cwd=integration_tests_path)
-    logger.info('Integration test Running is completed.')
-
-
 def save_log_files():
     log_storage = Path(workspace + "/" + LOG_STORAGE)
     if not Path.exists(log_storage):
@@ -519,6 +486,8 @@ def clone_repo():
     """Clone the product repo
     """
     try:
+        global tag_name
+        logger.info('cloning '+ git_repo_url + '@' + git_branch)
         subprocess.call(['git', 'clone', '--branch', git_branch, git_repo_url], cwd=workspace)
         logger.info('product repository cloning is done.')
     except Exception as e:
