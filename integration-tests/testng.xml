@@ -21,7 +21,7 @@
         <classes>
             <!--class name="org.wso2.identity.integration.test.consent.ConsentMgtTestCase"/-->
             <class name="org.wso2.identity.integration.test.user.export.UserInfoExportTestCase" />
-            <!--class name="org.wso2.identity.integration.test.consent.SelfSignUpConsentTest"/-->
+            <class name="org.wso2.identity.integration.test.consent.SelfSignUpConsentTest"/>
         </classes>
     </test>
 
@@ -211,7 +211,7 @@
             <!--class name="org.wso2.identity.integration.test.application.authz.ApplicationAuthzTestCase"/-->
             <!--class name="org.wso2.identity.integration.test.application.authz.ApplicationAuthzTenantTestCase"/-->
             <!--<class name="org.wso2.identity.integration.test.saml.SAMLLocalAndOutboundAuthenticatorsTestCase"/>-->
-            <class name="org.wso2.identity.integration.test.oauth2.dcrm.api.OAuthDCRMTestCase"/>
+            <!--class name="org.wso2.identity.integration.test.oauth2.dcrm.api.OAuthDCRMTestCase"/-->
             <!--class name="org.wso2.identity.integration.test.saml.SAMLErrorResponseTestCase"/-->
         </classes>
     </test>
@@ -219,7 +219,7 @@
         <classes>
             <!--class name="org.wso2.identity.integration.test.saml.ChangeACSUrlTestCase"/-->
             <!--class name="org.wso2.identity.integration.test.saml.SAMLFederationWithFileBasedSPAndIDPTestCase"/-->
-            <class name="org.wso2.identity.integration.test.user.profile.mgt.UserProfileAdminTestCase"/>
+            <!--class name="org.wso2.identity.integration.test.user.profile.mgt.UserProfileAdminTestCase"/-->
         </classes>
     </test>
     <test name="is-tests-oauth2-encryption" preserve-order="true" parallel="false">
