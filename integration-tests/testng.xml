@@ -21,7 +21,7 @@
         <classes>
             <!--class name="org.wso2.identity.integration.test.consent.ConsentMgtTestCase"/-->
             <class name="org.wso2.identity.integration.test.user.export.UserInfoExportTestCase" />
-            <class name="org.wso2.identity.integration.test.consent.SelfSignUpConsentTest"/>
+            <!--class name="org.wso2.identity.integration.test.consent.SelfSignUpConsentTest"/-->
         </classes>
     </test>
 
@@ -185,7 +185,7 @@
             <!--Entitlement Test Cases-->
             <!--<class name="org.wso2.identity.integration.test.entitlement.EntitlementPIPAttributeCacheTestCase"/>-->
             <class name="org.wso2.identity.integration.test.entitlement.EntitlementSecurityTestCase"/>
-            <!--class name="org.wso2.identity.integration.test.entitlement.EntitlementRestServiceTestCase"/-->
+            <class name="org.wso2.identity.integration.test.entitlement.EntitlementRestServiceTestCase"/>
 
             <!-- Request path authenticator test cases-->
             <!--class name="org.wso2.identity.integration.test.requestPathAuthenticator.SAMLWithRequestPathAuthenticationTest" /-->
