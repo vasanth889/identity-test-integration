@@ -20,14 +20,14 @@
     <test name="is-tests-consent" parallel="false" group-by-instances="true">
         <classes>
             <!--class name="org.wso2.identity.integration.test.consent.ConsentMgtTestCase"/-->
-            <class name="org.wso2.identity.integration.test.user.export.UserInfoExportTestCase" />
+            <!--<class name="org.wso2.identity.integration.test.user.export.UserInfoExportTestCase" /> -->
             <!--class name="org.wso2.identity.integration.test.consent.SelfSignUpConsentTest"/-->
         </classes>
     </test>
 
     <test name="is-tests-discovery" preserve-order="true" parallel="false" group-by-instances="true">
         <classes>
-            <class name="org.wso2.identity.integration.test.oauth2.OIDCDiscoveryTestCase"/>
+            <!--<class name="org.wso2.identity.integration.test.oauth2.OIDCDiscoveryTestCase"/>-->
         </classes>
     </test>
 
@@ -94,7 +94,7 @@
             <class name="org.wso2.identity.integration.test.user.account.connector.UserAccountConnectorTestCase"/>
             <class name="org.wso2.identity.integration.test.AuthenticationAdminTestCase"/>-->
             <!--<class name="org.wso2.identity.integration.test.um.ws.api.RemoteAuthorizationManagerServiceTestCase" />-->
-            <class name="org.wso2.identity.integration.test.claim.metadata.mgt.ClaimMetadataManagementServiceTestCase"/>
+            <!--<class name="org.wso2.identity.integration.test.claim.metadata.mgt.ClaimMetadataManagementServiceTestCase"/>-->
             <!--<class name="org.wso2.identity.integration.test.mgt.ClaimManagementServiceTestCase" />-->
 
             <!--Identity Management Test Cases-->
@@ -119,7 +119,7 @@
             <!--OAuth Test Cases-->
             <!--class name="org.wso2.identity.integration.test.oauth2.OAuth2ServiceAuthCodeGrantOpenIdTestCase"/-->
             <!--class name="org.wso2.identity.integration.test.oauth2.OAuth2ServiceAuthCodeGrantOpenIdRequestObjectTestCase"/-->
-            <class name="org.wso2.identity.integration.test.oauth2.OAuth2RequestObjectSignatureValidationTestCase"/>
+            <!--<class name="org.wso2.identity.integration.test.oauth2.OAuth2RequestObjectSignatureValidationTestCase"/>-->
             <!--class name="org.wso2.identity.integration.test.oauth2.OAuth2IDTokenEncryptionTestCase"/-->
             <!--class name="org.wso2.identity.integration.test.oauth2.OAuth2ServiceClientCredentialTestCase"/-->
             <!--class name="org.wso2.identity.integration.test.oauth2.OAuth2ServiceImplicitGrantTestCase"/-->
