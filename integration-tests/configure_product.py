@@ -143,13 +143,21 @@ def modify_pom_files():
 def attach_jolokia_agent(spath):
     logger.info('attaching jolokia agent as a java agent')
     sp = str(spath)
+
+    if sys.platform.startswith('win'):
+        jolokia_agent = \
+            "    -javaagent:C:\\testgrid\\jolokia-jvm-1.6.0-agent.jar=port=8778,host=localhost,protocol=http \\\n"
+    else:
+        jolokia_agent = \
+            "    -javaagent:/opt/wso2/jolokia-jvm-1.6.0-agent.jar=port=8778,host=localhost,protocol=http \\\n"
+
     with open(sp, "r") as in_file:
         buf = in_file.readlines()
 
     with open(sp, "w") as out_file:
         for line in buf:
             if line == "    $JAVACMD \\\n":
-                line = line + "    -javaagent:/opt/wso2/jolokia-jvm-1.6.0-agent.jar=port=8778,host=localhost,protocol=http \\\n"
+                line = line + jolokia_agent
                 logger.info(line)
             out_file.write(line)
 
@@ -203,9 +211,9 @@ def modify_datasources():
 def copy_distribution_to_m2(storage, name, version):
     # todo need to generalize this method
     home = Path.home()
-    linux_m2_path = home / ".m2/repository/org/wso2/is/wso2is" / str(version) / name
+    linux_m2_path = home / ".m2/repository/org/wso2/is/wso2is" / version / name
     windows_m2_path = Path(
-        "/Documents and Settings/Administrator/.m2/repository/org/wso2/is/wso2is" + "/" + str(version) + "/" + name)
+        "/Documents and Settings/Administrator/.m2/repository/org/wso2/is/wso2is" + "/" + version + "/" + name)
     if sys.platform.startswith('win'):
         windows_m2_path = winapi_path(windows_m2_path)
         storage = winapi_path(storage)
