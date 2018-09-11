@@ -24,8 +24,6 @@ import shutil
 import pymysql
 import sqlparse
 import re
-import lxml.etree
-import lxml.builder
 from pathlib import Path
 import urllib.request as urllib2
 from xml.dom import minidom
@@ -465,20 +463,13 @@ def run_integration_test():
     """Run integration tests.
     """
     integration_tests_path = Path(workspace + "/" + product_id + "/" + 'modules/integration')
-    custom_maven_command_args = ""
-    if custom_m2_remote_repository is not None:
-        #As a good practice, change the default local repository since the remote repository is going to be changed.
-        custom_maven_command_args = "-PcustomProfile"
-
     if sys.platform.startswith('win'):
         subprocess.call(['mvn', 'clean', 'install', '-B',
-                         '-Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn',
-                         custom_maven_command_args],
+                         '-Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn'],
                         shell=True, cwd=integration_tests_path)
     else:
         subprocess.call(['mvn', 'clean', 'install', '-B',
-                         '-Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn',
-                         custom_maven_command_args],
+                         '-Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn'],
                         cwd=integration_tests_path)
     logger.info('Integration test Running is completed.')
 
@@ -570,6 +561,24 @@ def get_latest_released_dist():
     download_file(dist_downl_url, str(get_product_file_path()))
     logger.info('downloading the latest released pack from Jenkins is completed.')
 
+#todo: copy dist from local_m2 instead of fetching from Jenkins
+# def get_dist_from_local_m2():
+#     home = Path.home()
+#     linux_m2_path = home / ".m2/repository/org/wso2/is/wso2is" / str(version) / product_name
+#
+#      if sys.platform.startswith('win'):
+#         m2_path = Path(
+#              "/Documents and Settings/Administrator/.m2/repository/org/wso2/is/wso2is" + "/" + str(version) + "/" + product_name)
+#         m2_path = cp.winapi_path(m2_path)
+#         storage = cp.winapi_path(storage)
+#         compress_distribution(windows_m2_path, storage)
+#         shutil.rmtree(windows_m2_path, onerror=on_rm_error)
+#     else:
+#         compress_distribution(linux_m2_path, storage)
+#         shutil.rmtree(linux_m2_path, onerror=on_rm_error)
+#
+#
+#
 
 def get_latest_stable_artifacts_api():
     """Get the API of the latest stable artifacts
@@ -623,61 +632,18 @@ def replace_file(source, destination):
 def build_source(source_path):
     """Build a given module.
     """
-    logger.info('Building the source excluding test module: ' + str(source_path))
-    custom_maven_command_args = "-pl \"!modules/integration\""
+    logger.info('Building the source skipping tests')
     if sys.platform.startswith('win'):
         subprocess.call(['mvn', 'clean', 'install', '-B',
-                         '-Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn'],
-                         '-Dmaven.test.skip=true',
-                        custom_maven_command_args,
+                         '-Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn',
+                         '-Dmaven.test.skip=true'],
                         shell=True, cwd=source_path)
     else:
         subprocess.call(['mvn', 'clean', 'install', '-B',
-                         '-Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn'],
-                         '-Dmaven.test.skip=true',
-                        custom_maven_command_args,
+                         '-Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn',
+                         '-Dmaven.test.skip=true'],
                         cwd=source_path)
     logger.info('Module build is completed. Module: ' + str(source_path))
-
-
-def add_m2_settings_xml(customRepoUrl):
-    """Add a settings xml file to m2 repository including custom remote m2 repository
-    """
-    elementMaker = lxml.builder.ElementMaker()
-    settings = elementMaker.settings
-    profiles = elementMaker.profiles
-    profile = elementMaker.profile
-    repositories = elementMaker.repositories
-    repository = elementMaker.repository
-    id = elementMaker.id
-    name = elementMaker.name
-    url = elementMaker.url
-
-    xmlContent = settings(
-        profiles(
-            profile(
-                id('customProfile'),
-                repositories(
-                    repository(
-                        id('custom-nexus-repository'),
-                        name('Custom Nexus Repository'),
-                        url(customRepoUrl)
-                    )	)
-            )
-        )
-    )
-
-    print lxml.etree.tostring(xmlContent, pretty_print=True)
-
-    if sys.platform.startswith('win'):
-        m2_home = Path("/Documents and Settings/Administrator/.m2/")
-        m2_home = cp.winapi_path(m2_home)
-    else:
-        m2_home = Path.home() / ".m2/"
-    m2_settings_file = open(m2_home + "settings.xml", "w")
-    m2_settings_file.write(lxml.etree.tostring(xmlContent, pretty_print=True))
-    m2_settings_file.close()
-    logger.info("Added settings.xml to m2 repository changing remote m2 location to " + customRepoUrl)
 
 
 def main():
@@ -720,8 +686,8 @@ def main():
             get_latest_released_dist()
             # if custom_m2_repository is given, the build will point there
             # this is required when building release-candidates (since RC candidates are added only to staging nexus)
-            if custom_m2_remote_repository is not None:
-                add_m2_settings_xml(custom_m2_remote_repository)
+            # if custom_m2_remote_repository is not None:
+            #     add_m2_settings_xml(custom_m2_remote_repository)
         elif test_mode == "BUILDFROMSOURCE":
             checkout_to_tag(get_latest_tag_name(product_id))
             product_name = get_product_name()
