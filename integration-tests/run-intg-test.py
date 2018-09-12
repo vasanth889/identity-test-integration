@@ -467,13 +467,13 @@ def run_integration_test():
         # subprocess.call(['mvn', 'clean', 'install', '-B',
         #                  '-Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn'],
         #                 shell=True, cwd=integration_tests_path)
-        subprocess.call(['mvn', 'clean', 'install', '-e'],
+        subprocess.call(['mvn', 'clean', 'install', '-B', '-e'],
                         shell=True, cwd=integration_tests_path)
     else:
         # subprocess.call(['mvn', 'clean', 'install', '-B',
         #                  '-Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn'],
         #                 cwd=integration_tests_path)
-        subprocess.call(['mvn', 'clean', 'install', '-e'],
+        subprocess.call(['mvn', 'clean', 'install', '-B', '-e'],
                         cwd=integration_tests_path)
     logger.info('Integration test Running is completed.')
 
@@ -638,13 +638,19 @@ def build_source(source_path):
     """
     logger.info('Building the source skipping tests')
     if sys.platform.startswith('win'):
-        subprocess.call(['mvn', 'clean', 'install', '-B',
-                         '-Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn',
+        # subprocess.call(['mvn', 'clean', 'install', '-B',
+        #                  '-Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn',
+        #                  '-Dmaven.test.skip=true'],
+        #                 shell=True, cwd=source_path)
+        subprocess.call(['mvn', 'clean', 'install', '-B', '-e',
                          '-Dmaven.test.skip=true'],
                         shell=True, cwd=source_path)
     else:
-        subprocess.call(['mvn', 'clean', 'install', '-B',
-                         '-Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn',
+        # subprocess.call(['mvn', 'clean', 'install', '-B',
+        #                  '-Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn',
+        #                  '-Dmaven.test.skip=true'],
+        #                 cwd=source_path)
+        subprocess.call(['mvn', 'clean', 'install', '-B', '-e',
                          '-Dmaven.test.skip=true'],
                         cwd=source_path)
     logger.info('Module build is completed. Module: ' + str(source_path))
