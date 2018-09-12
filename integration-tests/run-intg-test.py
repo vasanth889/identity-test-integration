@@ -464,12 +464,16 @@ def run_integration_test():
     """
     integration_tests_path = Path(workspace + "/" + product_id + "/" + 'modules/integration')
     if sys.platform.startswith('win'):
-        subprocess.call(['mvn', 'clean', 'install', '-B',
-                         '-Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn'],
+        # subprocess.call(['mvn', 'clean', 'install', '-B',
+        #                  '-Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn'],
+        #                 shell=True, cwd=integration_tests_path)
+        subprocess.call(['mvn', 'clean', 'install', '-e'],
                         shell=True, cwd=integration_tests_path)
     else:
-        subprocess.call(['mvn', 'clean', 'install', '-B',
-                         '-Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn'],
+        # subprocess.call(['mvn', 'clean', 'install', '-B',
+        #                  '-Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn'],
+        #                 cwd=integration_tests_path)
+        subprocess.call(['mvn', 'clean', 'install', '-e'],
                         cwd=integration_tests_path)
     logger.info('Integration test Running is completed.')
 
