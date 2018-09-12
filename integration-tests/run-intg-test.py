@@ -700,7 +700,16 @@ def main():
             source_path = Path(workspace + "/" + product_id)
             build_source(source_path)
             get_latest_released_dist()
-
+            testng_source = Path(workspace + "/" + "testng.xml")
+            testng_destination = Path(workspace + "/" + product_id + "/" +
+                                      'modules/integration/tests-integration/tests-backend/src/test/resources/testng.xml')
+            testng_server_mgt_source = Path(workspace + "/" + "testng-server-mgt.xml")
+            testng_server_mgt_destination = Path(workspace + "/" + product_id + "/" +
+                                                 'modules/integration/tests-integration/tests-backend/src/test/resources/testng-server-mgt.xml')
+            # replace testng source
+            replace_file(testng_source, testng_destination)
+            # replace testng server mgt source
+            replace_file(testng_server_mgt_source, testng_server_mgt_destination)
         elif test_mode == "SNAPSHOT":
             # product name retrieve from product pom files
             product_name = get_product_name()
