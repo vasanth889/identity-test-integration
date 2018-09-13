@@ -205,7 +205,7 @@ def copy_distribution_to_m2(storage, name, version):
     home = Path.home()
     linux_m2_path = home / ".m2/repository/org/wso2/is/wso2is" / str(version) / name
     windows_m2_path = Path(
-        "/Documents and Settings/Administrator/.m2/repository/org/wso2/is/wso2is" + "/" + str(version) + "/" + name)
+        "/Documents and Settings/Administrator/.m2/repository/org/wso2/is/wso2is" + "/" + version.text + "/" + name)
     if sys.platform.startswith('win'):
         windows_m2_path = winapi_path(windows_m2_path)
         storage = winapi_path(storage)
