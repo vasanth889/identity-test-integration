@@ -55,7 +55,7 @@ db_password = None
 tag_name = None
 test_mode = None
 database_config = {}
-
+version = None
 
 def read_proprty_files():
     global db_engine
@@ -326,8 +326,8 @@ def get_product_name():
     artifact_root = artifact_tree.getroot()
     parent = artifact_root.find('d:parent', NS)
     artifact_id = artifact_root.find('d:artifactId', NS)
-    version = parent.find('d:version', NS)
-    product_name = artifact_id.text + "-" + version.text
+    version = parent.find('d:version', NS).text
+    product_name = artifact_id.text + "-" + version
     product_zip_name = product_name + ".zip"
     return product_name
 
