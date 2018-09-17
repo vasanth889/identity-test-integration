@@ -54,6 +54,7 @@ db_username = None
 db_password = None
 tag_name = None
 test_mode = None
+build_from_source = None
 database_config = {}
 version = None
 
@@ -74,6 +75,7 @@ def read_proprty_files():
     global product_id
     global database_config
     global test_mode
+    global build_from_source
 
     workspace = os.getcwd()
     property_file_paths = []
@@ -121,6 +123,8 @@ def read_proprty_files():
                         db_password = val.strip()
                     elif key == "TEST_MODE":
                         test_mode = val.strip()
+                    elif key == "BUILD_FROM_SOURCE":
+                        build_from_source = val.strip()
     else:
         raise Exception("Test Plan Property file or Infra Property file is not in the workspace: " + workspace)
 
@@ -561,24 +565,6 @@ def get_latest_released_dist():
     download_file(dist_downl_url, str(get_product_file_path()))
     logger.info('downloading the latest released pack from Jenkins is completed.')
 
-#todo: copy dist from local_m2 instead of fetching from Jenkins
-# def get_dist_from_local_m2():
-#     home = Path.home()
-#     linux_m2_path = home / ".m2/repository/org/wso2/is/wso2is" / str(version) / product_name
-#
-#      if sys.platform.startswith('win'):
-#         m2_path = Path(
-#              "/Documents and Settings/Administrator/.m2/repository/org/wso2/is/wso2is" + "/" + str(version) + "/" + product_name)
-#         m2_path = cp.winapi_path(m2_path)
-#         storage = cp.winapi_path(storage)
-#         compress_distribution(windows_m2_path, storage)
-#         shutil.rmtree(windows_m2_path, onerror=on_rm_error)
-#     else:
-#         compress_distribution(linux_m2_path, storage)
-#         shutil.rmtree(linux_m2_path, onerror=on_rm_error)
-#
-#
-#
 
 def get_latest_stable_artifacts_api():
     """Get the API of the latest stable artifacts
@@ -634,18 +620,10 @@ def build_source(source_path):
     """
     logger.info('Building the source skipping tests')
     if sys.platform.startswith('win'):
-        # subprocess.call(['mvn', 'clean', 'install', '-B',
-        #                  '-Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn',
-        #                  '-Dmaven.test.skip=true'],
-        #                 shell=True, cwd=source_path)
         subprocess.call(['mvn', 'clean', 'install', '-B', '-e',
                          '-Dmaven.test.skip=true'],
                         shell=True, cwd=source_path)
     else:
-        # subprocess.call(['mvn', 'clean', 'install', '-B',
-        #                  '-Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn',
-        #                  '-Dmaven.test.skip=true'],
-        #                 cwd=source_path)
         subprocess.call(['mvn', 'clean', 'install', '-B', '-e',
                          '-Dmaven.test.skip=true'],
                         cwd=source_path)
@@ -689,27 +667,10 @@ def main():
             checkout_to_tag(get_latest_tag_name(product_id))
             # product name retrieve from product pom files
             product_name = get_product_name()
+            if build_from_source == "TRUE":
+                source_path = Path(workspace + "/" + product_id)
+                build_source(source_path)
             get_latest_released_dist()
-            # if custom_m2_repository is given, the build will point there
-            # this is required when building release-candidates (since RC candidates are added only to staging nexus)
-            # if custom_m2_remote_repository is not None:
-            #     add_m2_settings_xml(custom_m2_remote_repository)
-        elif test_mode == "BUILDFROMSOURCE":
-            checkout_to_tag(get_latest_tag_name(product_id))
-            product_name = get_product_name()
-            source_path = Path(workspace + "/" + product_id)
-            build_source(source_path)
-            get_latest_released_dist()
-            testng_source = Path(workspace + "/" + "testng.xml")
-            testng_destination = Path(workspace + "/" + product_id + "/" +
-                                      'modules/integration/tests-integration/tests-backend/src/test/resources/testng.xml')
-            testng_server_mgt_source = Path(workspace + "/" + "testng-server-mgt.xml")
-            testng_server_mgt_destination = Path(workspace + "/" + product_id + "/" +
-                                                 'modules/integration/tests-integration/tests-backend/src/test/resources/testng-server-mgt.xml')
-            # replace testng source
-            replace_file(testng_source, testng_destination)
-            # replace testng server mgt source
-            replace_file(testng_server_mgt_source, testng_server_mgt_destination)
         elif test_mode == "SNAPSHOT":
             # product name retrieve from product pom files
             product_name = get_product_name()
@@ -727,10 +688,6 @@ def main():
             raise Exception("Failed the product configuring")
         setup_databases(script_path, db_names)
         logger.info('Database setting up is done.')
-        # logger.info('Building dependency modules for intg-module.')
-        # if product_id == "product-is":
-        #     module_path = Path(workspace + "/" + product_id + "/" + 'modules/samples')
-        #     build_module(module_path)
         logger.info('Starting Integration test running.')
         #run integration tests
         run_integration_test()
